@@ -28,7 +28,7 @@ class Area():
         return self.rect.collidepoint(x, y)       
     
 '''класс надпись'''
- 
+  
 class Label(Area):
     def set_text(self, text, fsize=12, text_color=(0, 0, 0)):
         self.image = pygame.font.SysFont('verdana', fsize).render(text, True, text_color)

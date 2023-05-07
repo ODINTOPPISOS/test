@@ -1,8 +1,8 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import *
 from instr import *
-#from second_win import *
-class MainWin(QWidget):
+from final_win import *
+class TestWin(QWidget):
     def __init__(self):
         super().__init__()
         self.set_appear()
@@ -17,6 +17,7 @@ class MainWin(QWidget):
         self.b4.clicked.connect(self.next_click)
     def next_click(self):
         self.hide()
+        self.tw = FinalWin()
 
     def initUI(self):
         self.l1 = QLabel('Введите Ф.И.О.:')
@@ -57,7 +58,7 @@ class MainWin(QWidget):
         self.h_line.addLayout(self.r_line)
         self.setLayout(self.h_line)
 
-app = QApplication([])
-mw = MainWin()
+"""app = QApplication([])
+mw = TestWin()
 mw.show()
-app.exec_()
+app.exec_()"""

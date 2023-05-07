@@ -8,7 +8,7 @@ class FinalWin(QWidget):
         super().__init__()
         self.initUI()
         self.set_appear()
-        self.show
+        self.show()
 
     def initUI(self):
         self.workh_text = QLabel(txt_workheart)
@@ -25,6 +25,5 @@ class FinalWin(QWidget):
         self.move(win_x, win_y)
 
 """app = QApplication([])
-mv = FinalWin()
-mv.show()
+
 app.exec_()"""

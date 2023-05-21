@@ -1,64 +1,184 @@
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import *
+from PyQt5.QtCore import Qt, QTimer, QTime, QLocale
+from PyQt5.QtGui import QDoubleValidator, QIntValidator, QFont # проверка типов вводимых значений
+from PyQt5.QtWidgets import (
+       QApplication, QWidget,
+       QHBoxLayout, QVBoxLayout, QGridLayout,
+       QGroupBox, QRadioButton,
+       QPushButton, QLabel, QListWidget, QLineEdit)
+
+
 from instr import *
 from final_win import *
+
+
+class Experiment():
+    def __init__(self, age, test1, test2, test3):
+        self.age = age
+        self.t1 = test1
+        self.t2 = test2
+        self.t3 = test3
+s = []
+
 class TestWin(QWidget):
     def __init__(self):
+        ''' окно, в котором проводится опрос '''
         super().__init__()
+
+
+        # создаём и настраиваем графические элементы:
+        self.initUI()
+
+
+        #устанавливает связи между элементами
+        self.connects()
+
+
+        #устанавливает, как будет выглядеть окно (надпись, размер, место)
         self.set_appear()
-        self.initUI() 
-        self.connects() 
-        self.show() 
-    def set_appear(self): 
+        
+        # старт:
+        self.show()
+
+
+    ''' устанавливает, как будет выглядеть окно (надпись, размер, место) '''
+    def set_appear(self):
         self.setWindowTitle(txt_title)
-        self.resize(1000, 600)
-        self.move(200, 100)
-    def connects(self):
-        self.b4.clicked.connect(self.next_click)
-    def next_click(self):
-        self.hide()
-        self.tw = FinalWin()
+        self.resize(win_width, win_height)
+        self.move(win_x, win_y)
+
 
     def initUI(self):
-        self.l1 = QLabel('Введите Ф.И.О.:')
-        self.l2 = QLabel('Полных лет:')
-        self.l3 = QLabel('Лягте на спину и замерьте пульс за 15 секунд. Нажмите кнопку "Начать первый тест", чтобы запустить таймер.Результат запишите в соответствующее поле.')
-        self.l4 = QLabel('Выполните 30 приседаний за 45 секунд. Для этого нажмите кнопку "Начать делать приседания",чтобы запустить счетчик приседаний.')
-        self.l5 = QLabel(txt_test3)
-        self.l6 = QLabel('147')
-        self.b1 = QPushButton('Начать первый тест')
-        self.b2 = QPushButton('Начать делать приседания')
-        self.b3 = QPushButton('Начать финальный тест')
-        self.b4 = QPushButton('Результаты')
-        self.e1 = QLineEdit("Ф.И.О.")
-        self.e2 = QLineEdit('0')
-        self.e3 = QLineEdit('0')
-        self.e4 = QLineEdit('0')
-        self.e5 = QLineEdit('0')
-        self.h_line = QHBoxLayout()
-        self.r_line = QVBoxLayout()
-        self.l_line = QVBoxLayout()
-        self.l_line.addWidget(self.l1)
-        self.l_line.addWidget(self.e1)
-        self.l_line.addWidget(self.l2)
-        self.l_line.addWidget(self.e2)
-        self.l_line.addWidget(self.l3)
-        self.l_line.addWidget(self.b1)
-        self.l_line.addWidget(self.e3)
-        self.l_line.addWidget(self.l4)
-        self.l_line.addWidget(self.b2)
-        self.l_line.addWidget(self.l5)
-        self.l_line.addWidget(self.b3)
-        self.l_line.addWidget(self.e4)
-        self.l_line.addWidget(self.e5)
-        self.l_line.addWidget(self.b4)
+        ''' создаёт графические элементы '''
+        self.btn_next = QPushButton(txt_sendresults, self)
+        self.btn_test1 = QPushButton(txt_starttest1, self)
+        self.btn_test2 = QPushButton(txt_starttest2, self)
+        self.btn_test3 = QPushButton(txt_starttest3, self)
 
-        self.r_line.addWidget(self.l6)
-        self.h_line.addLayout(self.l_line)
-        self.h_line.addLayout(self.r_line)
+
+
+
+        self.text_name = QLabel(txt_name)
+        self.text_age = QLabel(txt_age)
+        self.text_test1 = QLabel(txt_test1)
+        self.text_test2 = QLabel(txt_test2)
+        self.text_test3 = QLabel(txt_test3)
+        self.text_timer = QLabel(txt_timer)
+        self.text_timer.setFont(QFont("Times", 36, QFont.Bold))
+
+
+        self.line_name = QLineEdit(txt_hintname)
+
+
+        self.line_age = QLineEdit(txt_hintage)
+
+
+        self.line_test1 = QLineEdit(txt_hinttest1)
+
+
+        self.line_test2 = QLineEdit(txt_hinttest2)
+
+
+        self.line_test3 = QLineEdit(txt_hinttest3)
+
+
+        self.l_line = QVBoxLayout()
+        self.r_line = QVBoxLayout()
+        self.h_line = QHBoxLayout()
+        self.r_line.addWidget(self.text_timer, alignment = Qt.AlignCenter)
+        self.l_line.addWidget(self.text_name, alignment = Qt.AlignLeft)
+        self.l_line.addWidget(self.line_name, alignment = Qt.AlignLeft)
+        self.l_line.addWidget(self.text_age, alignment = Qt.AlignLeft)
+        self.l_line.addWidget(self.line_age, alignment = Qt.AlignLeft)
+        self.l_line.addWidget(self.text_test1, alignment = Qt.AlignLeft)
+        self.l_line.addWidget(self.btn_test1, alignment = Qt.AlignLeft)
+        self.l_line.addWidget(self.line_test1, alignment = Qt.AlignLeft)
+        self.l_line.addWidget(self.text_test2, alignment = Qt.AlignLeft)
+        self.l_line.addWidget(self.btn_test2, alignment = Qt.AlignLeft)
+        self.l_line.addWidget(self.text_test3, alignment = Qt.AlignLeft)
+        self.l_line.addWidget(self.btn_test3, alignment = Qt.AlignLeft)
+        self.l_line.addWidget(self.line_test2, alignment = Qt.AlignLeft)
+        self.l_line.addWidget(self.line_test3, alignment = Qt.AlignLeft)
+        self.l_line.addWidget(self.btn_next, alignment = Qt.AlignCenter)
+        self.h_line.addLayout(self.l_line) 
+        self.h_line.addLayout(self.r_line)       
         self.setLayout(self.h_line)
 
-"""app = QApplication([])
-mw = TestWin()
-mw.show()
-app.exec_()"""
+
+    def next_click(self):
+        self.hide()
+        self.fw = FinalWin([int(self.line_age.text()), self.line_test1.text(), self.line_test2.text(), self.line_test2.text()])
+
+
+    def timer_test(self):
+        global time
+        time = QTime(0, 0, 15)
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.timer1Event)
+        self.timer.start(1000)
+        
+    def timer1Event(self):
+        global time
+        time = time.addSecs(-1)
+        self.text_timer.setText(time.toString("hh:mm:ss"))
+        self.text_timer.setFont(QFont("Times", 36, QFont.Bold))
+        self.text_timer.setStyleSheet("color: rgb(0,0,0)")
+        if time.toString("hh:mm:ss") == "00:00:00":
+            self.timer.stop()
+
+    def timer_sits(self):
+        global time
+        time = QTime(0, 0, 30)
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.timer2Event)
+        #одно приседание в 1.5 секунды
+        self.timer.start(1500)
+
+
+    def timer_final(self):
+        global time
+        time = QTime(0, 1, 0)
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.timer3Event)
+        self.timer.start(1000)
+
+
+    def timer1Event(self):
+        global time
+        time = time.addSecs(-1)
+        self.text_timer.setText(time.toString("hh:mm:ss"))
+        self.text_timer.setFont(QFont("Times", 36, QFont.Bold))
+        self.text_timer.setStyleSheet("color: rgb(0,0,0)")
+        if time.toString("hh:mm:ss") == "00:00:00":
+            self.timer.stop()
+
+
+    def timer2Event(self):
+        global time
+        time = time.addSecs(-1)
+        self.text_timer.setText(time.toString("hh:mm:ss")[6:8])
+        self.text_timer.setStyleSheet("color: rgb(0,0,0)")
+        self.text_timer.setFont(QFont("Times", 36, QFont.Bold))
+        if time.toString("hh:mm:ss") == "00:00:00":
+            self.timer.stop()
+
+
+    def timer3Event(self):
+        global time
+        time = time.addSecs(-1)
+        self.text_timer.setText(time.toString("hh:mm:ss"))
+        if int(time.toString("hh:mm:ss")[6:8]) >= 45:
+            self.text_timer.setStyleSheet("color: rgb(0,255,0)")
+        elif int(time.toString("hh:mm:ss")[6:8]) <= 15:
+            self.text_timer.setStyleSheet("color: rgb(0,255,0)")
+        else:
+            self.text_timer.setStyleSheet("color: rgb(0,0,0)")
+        self.text_timer.setFont(QFont("Times", 36, QFont.Bold))
+        if time.toString("hh:mm:ss") == "00:00:00":
+            self.timer.stop()
+
+
+    def connects(self):
+        self.btn_next.clicked.connect(self.next_click)
+        self.btn_test1.clicked.connect(self.timer_test)
+        self.btn_test2.clicked.connect(self.timer_sits)
+        self.btn_test3.clicked.connect(self.timer_final)
